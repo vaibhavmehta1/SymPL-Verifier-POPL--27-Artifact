@@ -1,0 +1,65 @@
+method,variant,N,D,time_s,status
+Symplectic Euler,Coupled Oscillators,2,4,5.575,PASS
+Symplectic Euler,Coupled Oscillators,4,8,5.659,PASS
+Symplectic Euler,Coupled Oscillators,8,16,4.983,PASS
+Symplectic Euler,Coupled Oscillators,16,32,4.975,PASS
+Symplectic Euler,Coupled Oscillators,32,64,5.331,PASS
+Symplectic Euler,Coupled Oscillators,64,128,6.851,PASS
+Symplectic Euler,Coupled Oscillators,128,256,9.326,PASS
+Symplectic Euler,Coupled Oscillators,256,512,13.065,PASS
+Symplectic Euler,Independent Oscillators,2,4,4.597,PASS
+Symplectic Euler,Independent Oscillators,4,8,4.622,PASS
+Symplectic Euler,Independent Oscillators,8,16,5.095,PASS
+Symplectic Euler,Independent Oscillators,16,32,5.596,PASS
+Symplectic Euler,Independent Oscillators,32,64,6.044,PASS
+Symplectic Euler,Independent Oscillators,64,128,7.666,PASS
+Symplectic Euler,Independent Oscillators,128,256,11.179,PASS
+Symplectic Euler,Independent Oscillators,256,512,20.184,PASS
+Leapfrog ,Coupled Oscillators,2,4,7.814,PASS
+Leapfrog ,Coupled Oscillators,4,8,8.731,PASS
+Leapfrog ,Coupled Oscillators,8,16,6.171,PASS
+Leapfrog ,Coupled Oscillators,16,32,6.512,PASS
+Leapfrog ,Coupled Oscillators,32,64,6.736,PASS
+Leapfrog ,Coupled Oscillators,64,128,5.379,PASS
+Leapfrog ,Coupled Oscillators,128,256,9.108,PASS
+Leapfrog ,Coupled Oscillators,256,512,11.849,PASS
+Leapfrog ,Independent Oscillators,2,4,3.485,PASS
+Leapfrog ,Independent Oscillators,4,8,4.088,PASS
+Leapfrog ,Independent Oscillators,8,16,3.702,PASS
+Leapfrog ,Independent Oscillators,16,32,4.476,PASS
+Leapfrog ,Independent Oscillators,32,64,5.611,PASS
+Leapfrog ,Independent Oscillators,64,128,7.135,PASS
+Leapfrog ,Independent Oscillators,128,256,7.790,PASS
+Leapfrog ,Independent Oscillators,256,512,14.719,PASS
+Stormer-Verlet ,Coupled Oscillators,2,4,4.593,PASS
+Stormer-Verlet ,Coupled Oscillators,4,8,5.371,PASS
+Stormer-Verlet ,Coupled Oscillators,8,16,4.223,PASS
+Stormer-Verlet ,Coupled Oscillators,16,32,4.331,PASS
+Stormer-Verlet ,Coupled Oscillators,32,64,4.561,PASS
+Stormer-Verlet ,Coupled Oscillators,64,128,5.936,PASS
+Stormer-Verlet ,Coupled Oscillators,128,256,7.826,PASS
+Stormer-Verlet ,Coupled Oscillators,256,512,14.535,PASS
+Stormer-Verlet ,Independent Oscillators,2,4,5.098,PASS
+Stormer-Verlet ,Independent Oscillators,4,8,5.307,PASS
+Stormer-Verlet ,Independent Oscillators,8,16,4.201,PASS
+Stormer-Verlet ,Independent Oscillators,16,32,5.936,PASS
+Stormer-Verlet ,Independent Oscillators,32,64,7.546,PASS
+Stormer-Verlet ,Independent Oscillators,64,128,6.421,PASS
+Stormer-Verlet ,Independent Oscillators,128,256,6.830,PASS
+Stormer-Verlet ,Independent Oscillators,256,512,15.743,PASS
+Implicit midpoint,Coupled Oscillators,2,4,10.101,PASS
+Implicit midpoint,Coupled Oscillators,4,8,93.572,PASS
+Implicit midpoint,Coupled Oscillators,8,16,120.140,TIMEOUT
+Implicit midpoint,Independent Oscillators,2,4,5.099,PASS
+Implicit midpoint,Independent Oscillators,4,8,4.820,PASS
+Implicit midpoint,Independent Oscillators,8,16,4.225,PASS
+Implicit midpoint,Independent Oscillators,16,32,4.484,PASS
+Implicit midpoint,Independent Oscillators,32,64,6.069,PASS
+Implicit midpoint,Independent Oscillators,64,128,20.748,PASS
+Implicit midpoint,Independent Oscillators,128,256,120.144,TIMEOUT
+Gauss-Legendre 2 (GL-2),Coupled Oscillators,2,4,120.200,TIMEOUT
+Gauss-Legendre 2 (GL-2),Independent Oscillators,2,4,11.003,PASS
+Gauss-Legendre 2 (GL-2),Independent Oscillators,4,8,17.060,PASS
+Gauss-Legendre 2 (GL-2),Independent Oscillators,8,16,25.753,PASS
+Gauss-Legendre 2 (GL-2),Independent Oscillators,16,32,47.716,PASS
+Gauss-Legendre 2 (GL-2),Independent Oscillators,32,64,120.147,TIMEOUT
