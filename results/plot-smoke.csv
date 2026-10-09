@@ -1,0 +1,11 @@
+method,variant,N,D,time_s,status
+symplectic Euler,coupled,2,4,6.583,PASS
+symplectic Euler,regular,2,4,4.110,PASS
+leapfrog (KDK),coupled,2,4,4.172,PASS
+leapfrog (KDK),regular,2,4,3.574,PASS
+Stoermer-Verlet (DKD),coupled,2,4,3.583,PASS
+Stoermer-Verlet (DKD),regular,2,4,3.690,PASS
+implicit midpoint,coupled,2,4,5.223,PASS
+implicit midpoint,regular,2,4,3.802,PASS
+Gauss-Legendre 2 (GL-2),coupled,2,4,30.061,TIMEOUT
+Gauss-Legendre 2 (GL-2),regular,2,4,8.882,PASS

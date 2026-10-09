@@ -1,0 +1,46 @@
+==============================================================================
+SYMPLECTIC VERIFIER -- BENCHMARK SUITE
+  benchmarks : 10
+  budget     : 30 s per benchmark (process-group kill)
+==============================================================================
+
+  SCALING ---
+    symplectic Euler [coupled] / N=2 (D=4)         ... PASS        6.58s
+    symplectic Euler [regular] / N=2 (D=4)         ... PASS        4.11s
+    leapfrog (KDK) [coupled] / N=2 (D=4)           ... PASS        4.17s
+    leapfrog (KDK) [regular] / N=2 (D=4)           ... PASS        3.57s
+    Stoermer-Verlet (DKD) [coupled] / N=2 (D=4)    ... PASS        3.58s
+    Stoermer-Verlet (DKD) [regular] / N=2 (D=4)    ... PASS        3.69s
+    implicit midpoint [coupled] / N=2 (D=4)        ... PASS        5.22s
+    implicit midpoint [regular] / N=2 (D=4)        ... PASS        3.80s
+    Gauss-Legendre 2 (GL-2) [coupled] / N=2 (D=4)  ... TIMEOUT    30.06s
+    Gauss-Legendre 2 (GL-2) [regular] / N=2 (D=4)  ... PASS        8.88s
+
+RESULTS
+┌─────────┬───────────────────────────────────────────────┬─────────┬────────┐
+│ Family  │ Benchmark                                     │  Status │   Time │
+├─────────┼───────────────────────────────────────────────┼─────────┼────────┤
+│ scaling │ symplectic Euler [coupled] / N=2 (D=4)        │   PASS  │  6.58s │
+│         │ symplectic Euler [regular] / N=2 (D=4)        │   PASS  │  4.11s │
+│         │ leapfrog (KDK) [coupled] / N=2 (D=4)          │   PASS  │  4.17s │
+│         │ leapfrog (KDK) [regular] / N=2 (D=4)          │   PASS  │  3.57s │
+│         │ Stoermer-Verlet (DKD) [coupled] / N=2 (D=4)   │   PASS  │  3.58s │
+│         │ Stoermer-Verlet (DKD) [regular] / N=2 (D=4)   │   PASS  │  3.69s │
+│         │ implicit midpoint [coupled] / N=2 (D=4)       │   PASS  │  5.22s │
+│         │ implicit midpoint [regular] / N=2 (D=4)       │   PASS  │  3.80s │
+│         │ Gauss-Legendre 2 (GL-2) [coupled] / N=2 (D=4) │ TIMEOUT │ 30.06s │
+│         │ Gauss-Legendre 2 (GL-2) [regular] / N=2 (D=4) │   PASS  │  8.88s │
+└─────────┴───────────────────────────────────────────────┴─────────┴────────┘
+
+SUMMARY  (9 pass, 0 fail, 1 timeout, 0 error)
+┌─────────┬────────┬────────┐
+│ Family  │ Passed │   Time │
+├─────────┼────────┼────────┤
+│ scaling │   9/10 │ 73.68s │
+│ TOTAL   │   9/10 │ 73.68s │
+└─────────┴────────┴────────┘
+
+  slowest: Gauss-Legendre 2 (GL-2) [coupled] / N=2 (D=4) (30.1s, TIMEOUT), Gauss-Legendre 2 (GL-2) [regular] / N=2 (D=4) (8.9s, PASS), symplectic Euler [coupled] / N=2 (D=4) (6.6s, PASS)
+
+  wrote scaling data : results/plot-smoke.csv
+  wrote scaling plot : results/plot-smoke.pdf  (via /tmp/popl-plot-env/bin/python)
