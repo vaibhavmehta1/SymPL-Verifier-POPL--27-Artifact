@@ -23,20 +23,18 @@ Benchmark families
                  H3 Henon-Heiles         (2 DOF, coupled polynomial)
                  H4 double pendulum      (2 DOF, NONSEPARABLE, chaotic)
              The kick-drift methods stop at H3 (separable); H4 is reached only
-             by implicit midpoint (a deliberate CAS timeout) and by Tao, whose
-             doubling makes the nonseparable flow explicit and so verifies.
+             by implicit midpoint, GL-2, and Tao's explicit doubling scheme. All
+             use symbolic verification and may exhaust the time budget.
   CONFORMAL  conformal symplectic methods that contract omega by e^{-gam h}:
                  conformal Stoermer-Verlet (dissipative leapfrog)
                  conformal relativistic    (Franca-Jordan-Vidal RGD, 1st order)
   BESPOKE    the hand-built / domain maps:
                  Forest-Ruth, Tao, Boris, multipole kick, RESPA, exact bend.
 
-Each benchmark is verified in a fresh subprocess:
-  * a .spec file is checked by `sage -python parse.py <spec>`
-    (exit 0 = VERIFIED, exit 1 = not verified);
-  * the exact-bend map is symbolically intractable to simplify to zero, so it is
-    certified numerically by `sage -python examples/exact_bend_certificate.py`
-    (exit 0 = CERTIFIED) -- a CAS-performance limit, not a correctness one.
+Each benchmark's .spec file is checked in a fresh subprocess by
+`sage -python parse.py <spec>` (exit 0 = VERIFIED, exit 1 = not verified).
+Runs exceeding the budget are reported as TIMEOUT, including exact bend and
+Tao's double pendulum; there is no numerical fallback.
 
 Usage
 -----
@@ -63,6 +61,10 @@ BENCH = os.path.join(EX, "benchmarks")
 DEFAULT_TIMEOUT = 120          # hard per-benchmark budget, seconds
 KILL_GRACE = 5                 # SIGTERM -> SIGKILL grace, seconds
 DEFAULT_PLOT = os.path.join(EX, "benchmarks", "scaling", "scaling.pdf")
+PAPER_SCALING_METHODS = {
+    "symplectic Euler", "leapfrog (KDK)", "implicit midpoint",
+    "Gauss-Legendre 2 (GL-2)",
+}
 
 SAGE = os.environ.get("SAGE", "sage")
 
@@ -70,8 +72,7 @@ SAGE = os.environ.get("SAGE", "sage")
 class Bench:
     """One benchmark: a name, its family, and the command that verifies it.
 
-    `expect` is the verdict a correct run must produce: "VERIFIED" for the
-    structure-preserving maps, "CERTIFIED" for the numeric exact-bend check.
+    `expect` is the verdict a successful verification produces: "VERIFIED".
     """
 
     def __init__(self, family, name, argv, expect="VERIFIED", note="", meta=None):
@@ -118,23 +119,15 @@ def registry():
         for hkey, hlabel in hams:
             b.append(_tb("{} / {}".format(mlabel, hlabel),
                          "{}_{}.spec".format(mkey, hkey)))
-    # H4: double pendulum -- nonseparable & chaotic, so the separable kick-drift
-    # methods do not apply.  Two methods reach it:
-    #   * implicit midpoint -- its 4-D rational-trig stage solve is CAS-
-    #     intractable to simplify to zero, so it is EXPECTED to exhaust the
-    #     budget (a deliberate kill demo);
-    #   * Tao's doubling -- makes the same nonseparable H EXPLICITLY integrable
-    #     (no stage solve), so its map is genuinely symplectic where midpoint
-    #     times out.  Its five composed rational-trig flows still overwhelm
-    #     Maxima's simplify-to-zero (same CAS wall as exact_bend), so it is
-    #     certified NUMERICALLY -- a CAS-performance limit, not a correctness one.
+    # H4 is nonseparable, so the separable kick-drift methods do not apply.
+    # All three registered methods use the standard symbolic verifier; their
+    # rational-trigonometric expressions may exhaust the time budget.
     b.append(_tb("implicit midpoint / H4 double pendulum",
                  "implicit_midpoint_double_pendulum.spec"))
-    b.append(Bench("textbook", "Tao (doubling) / H4 double pendulum",
-                   [SAGE, "-python",
-                    os.path.join(EX, "tao_double_pendulum_certificate.py")],
-                   expect="CERTIFIED",
-                   note="explicit but CAS-heavy; certified numerically"))
+    b.append(_tb("Gauss-Legendre 2 (GL-2) / H4 double pendulum",
+                 "gl2_double_pendulum.spec"))
+    b.append(_tb("Tao (doubling) / H4 double pendulum",
+                 "tao_double_pendulum.spec"))
 
     # -- TAO on H1..H3: Tao's explicit doubling scheme also handles the classic
     # separable Hamiltonians, verified on the same doubled phase space.
@@ -187,11 +180,8 @@ def registry():
     b.append(_spec("bespoke", "Boris pusher (volume form)", "boris.spec"))
     b.append(_spec("bespoke", "multipole kick", "multipole_kick.spec"))
     b.append(_spec("bespoke", "RESPA (multiple time step)", "respa.spec"))
-    b.append(Bench("bespoke", "exact bend (numeric certificate)",
-                   [SAGE, "-python",
-                    os.path.join(EX, "exact_bend_certificate.py")],
-                   expect="CERTIFIED",
-                   note="symbolic simplify intractable; certified numerically"))
+    b.append(_spec("bespoke", "exact bend", "exact_bend.spec",
+                   note="symbolic verification may exhaust the time budget"))
     return b
 
 
@@ -346,7 +336,7 @@ def _find_plot_python():
     return None, env
 
 
-def write_scaling_plot(results, plot_path, budget):
+def write_scaling_plot(results, plot_path, budget, paper=False):
     """Emit a CSV of the scaling-family results and render a PDF or PNG.
 
     Plotting uses an interpreter with a working Matplotlib installation. The
@@ -378,8 +368,11 @@ def write_scaling_plot(results, plot_path, budget):
               "  (set PLOT_PYTHON, or run: <py> plot_scaling.py {} {} {:.0f})"
               .format(csv_path, csv_path, plot_path, budget))
         return
-    proc = subprocess.run([py, os.path.join(ROOT, "plot_scaling.py"),
-                           csv_path, plot_path, str(budget)],
+    plot_args = [py, os.path.join(ROOT, "plot_scaling.py"),
+                 csv_path, plot_path, str(budget)]
+    if paper:
+        plot_args.append("--paper")
+    proc = subprocess.run(plot_args,
                           cwd=ROOT, env=env,
                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     if proc.returncode == 0:
@@ -401,6 +394,8 @@ def main(argv):
                          "of these substrings (case-insensitive)")
     ap.add_argument("--list", action="store_true",
                     help="list the selected benchmarks and exit")
+    ap.add_argument("--paper-scaling", action="store_true",
+                    help="select only the four scaling methods in paper Figure 10")
     ap.add_argument("--verbose", action="store_true",
                     help="echo each benchmark's captured output")
     ap.add_argument("--plot", nargs="?", const=DEFAULT_PLOT, default=None,
@@ -411,6 +406,9 @@ def main(argv):
     args = ap.parse_args(argv[1:])
 
     benches = registry()
+    if args.paper_scaling:
+        benches = [b for b in benches if b.family == "scaling"
+                   and b.meta["method"] in PAPER_SCALING_METHODS]
     if args.only:
         needles = [s.lower() for s in args.only]
         benches = [b for b in benches
@@ -507,7 +505,7 @@ def main(argv):
         "{} ({:.1f}s, {})".format(b.name, t, v) for b, v, t in slow))
 
     if args.plot is not None:
-        write_scaling_plot(results, args.plot, args.timeout)
+        write_scaling_plot(results, args.plot, args.timeout, paper=args.paper_scaling)
 
     return 0 if (n_fail == 0 and n_err == 0) else 1
 

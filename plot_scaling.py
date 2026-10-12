@@ -18,6 +18,7 @@ Run with a Python interpreter that has a working Matplotlib installation:
     python3 plot_scaling.py scaling.csv scaling.pdf [budget_seconds]
 """
 
+import argparse
 import csv
 from pathlib import Path
 import sys
@@ -31,6 +32,8 @@ from matplotlib.ticker import ScalarFormatter
 
 ORDER = ["Symplectic Euler", "Leapfrog", "Stormer-Verlet",
          "Implicit midpoint", "Gauss-Legendre 2 (GL-2)"]
+PAPER_ORDER = ["Symplectic Euler", "Implicit midpoint",
+               "Gauss-Legendre 2 (GL-2)", "Leapfrog"]
 
 PANELS = [("coupled", "Coupled Oscillators"),
           ("regular", "Independent Oscillators")]
@@ -59,26 +62,33 @@ def load(csv_path):
 
 
 def main(argv):
-    if len(argv) < 3:
-        print("usage: python3 plot_scaling.py <csv> <out.png|out.pdf> [budget_s]")
-        return 2
-    csv_path, out_path = argv[1], argv[2]
-    budget = float(argv[3]) if len(argv) > 3 else 120.0
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("csv_path")
+    parser.add_argument("out_path", help="output PDF or PNG")
+    parser.add_argument("budget", nargs="?", type=float, default=120.0)
+    parser.add_argument("--paper", action="store_true",
+                        help="show the four methods and colour order of Figure 10")
+    args = parser.parse_args(argv[1:])
+    csv_path, out_path, budget = args.csv_path, args.out_path, args.budget
 
     series = load(csv_path)
+    order = PAPER_ORDER if args.paper else ORDER
+    if args.paper:
+        series = {key: pts for key, pts in series.items() if key[0] in PAPER_ORDER}
     if not series:
         print("no rows in", csv_path)
         return 1
 
     methods = sorted({m for m, _ in series},
-                     key=lambda m: (ORDER.index(m) if m in ORDER else 99, m))
+                     key=lambda m: (order.index(m) if m in order else 99, m))
     present = {v for _, v in series}
     panels = [(v, title) for v, title in PANELS if v in present]
     panels += [(v, v) for v in sorted(present - {v for v, _ in PANELS})]
     all_N = sorted({n for pts in series.values() for n, _, _ in pts})
 
     cmap = plt.get_cmap("tab10")
-    color_of = {m: cmap(i % 10) for i, m in enumerate(methods)}
+    color_of = {m: cmap((order.index(m) if m in order else i) % 10)
+                for i, m in enumerate(methods)}
 
     plt.rcParams.update({
         "font.size": 23, "axes.titlesize": 28, "axes.labelsize": 25,

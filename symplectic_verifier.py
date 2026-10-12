@@ -35,7 +35,26 @@ Run with the SageMath interpreter:
     sage -python symplectic_verifier.py          # runs the self-test suite
 """
 
+from itertools import count
+
 from sage.all import SR, var, diff, matrix, identity_matrix, vector
+
+
+_solution_symbol_ids = count()
+
+
+def _fresh_solution_symbol():
+    """Allocate a solution placeholder with a previously unused Sage name.
+
+    Freshness is per pullback occurrence, not per target, Solve object, or
+    Verifier. Also avoid names already registered by users: Sage and its CAS
+    interfaces identify named symbols globally. Keep the registration while
+    returned forms may still contain the symbol.
+    """
+    while True:
+        name = "_sv_phi_{}".format(next(_solution_symbol_ids))
+        if name not in SR.symbols:
+            return SR.var(name)
 
 
 def _simplify(coeff):
@@ -300,16 +319,18 @@ class Solve(Command):
     xi      : list of m sage symbols denoting the unknowns of G
     G       : list of m sage expressions G_i(xi, x, pi)
     h       : the step-size symbol h(pi)
-    phi     : optional list of m sage symbols for the abstract fixed point;
-              defaults to phi_<target>.
+    phi     : must be None. Caller-supplied solution symbols are rejected;
+              the verifier allocates fresh placeholders for each occurrence.
     """
 
     def __init__(self, targets, xi, G, h, phi=None):
+        if phi is not None:
+            raise ValueError("phi must be None; implicit solution symbols are "
+                             "allocated freshly by the verifier")
         self.targets = list(targets)
         self.xi = list(xi)
         self.G = [SR(g) for g in G]
         self.h = SR(h)
-        self.phi = phi
         m = len(self.targets)
         assert len(self.xi) == m and len(self.G) == m
 
@@ -381,11 +402,22 @@ class Verifier:
         m = len(cmd.targets)
         tgt = [ctx.idx(t) for t in cmd.targets]
 
-        # abstract fixed-point symbols phi_i
-        if cmd.phi is not None:
-            phi = list(cmd.phi)
-        else:
-            phi = [var("phi_{}".format(ctx.coord_names[r])) for r in tgt]
+        # If G does not depend on the unknown, the fixed-point equation is an
+        # explicit simultaneous assignment. Preserve its exact values instead
+        # of introducing unconstrained placeholders (in particular G=0 is skip).
+        unknowns = set(cmd.xi)
+        if all(not unknowns.intersection(g.variables()) for g in cmd.G):
+            return self.pull_assign(Assign(cmd.targets, [
+                ctx.coords[r] + cmd.h*g for r, g in zip(tgt, cmd.G)
+            ]), form)
+
+        # Each dynamic occurrence denotes a different solution value, even
+        # when the same Solve object is reused or unrolled in a loop. These
+        # independent placeholders give a conservative equality check: an
+        # identity must hold for all their values, without assuming relations
+        # between solutions at different states. They are not state functions
+        # for subsequent differentiation of an unsimplified returned Form.
+        phi = [_fresh_solution_symbol() for _ in tgt]
 
         # Jacobians of G, evaluated at the fixed point xi = phi.
         at_phi = {cmd.xi[l]: phi[l] for l in range(m)}
