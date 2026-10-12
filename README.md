@@ -57,13 +57,7 @@ sage --version
 sage -python -c 'from sage.all import SR; print(SR(1))'
 ```
 
-See the [official SageMath installation instructions](https://doc.sagemath.org/html/en/installation/conda)
-for platform setup. 
-
-```bash
-conda env export -n symplectic-artifact > environment.yml
-conda list --explicit > conda-explicit.txt
-```
+If these do not work, see the [official SageMath installation instructions](https://doc.sagemath.org/html/en/installation/conda). 
 
 ## Quick start and expected results
 
