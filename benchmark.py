@@ -33,8 +33,7 @@ Benchmark families
 
 Each benchmark's .spec file is checked in a fresh subprocess by
 `sage -python parse.py <spec>` (exit 0 = VERIFIED, exit 1 = not verified).
-Runs exceeding the budget are reported as TIMEOUT, including exact bend and
-Tao's double pendulum; there is no numerical fallback.
+Runs exceeding the budget are reported as TIMEOUT.
 
 Usage
 -----
