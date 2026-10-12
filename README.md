@@ -202,7 +202,7 @@ assert ok, residual
 computed pullback. Use `Verifier.pull(program, form)` when you need the pullback
 without the final equality check.
 
-To extend the project:
+The project can be extended in the following ways:
 
 1. **Add an integrator or Hamiltonian:** create a `.spec` under `examples/`, using
    existing textbook cases as templates. New combinations of assignments,
@@ -210,14 +210,11 @@ To extend the project:
    example and a deliberately perturbed negative example.
 2. **Add a scalar function:** register a Sage symbolic callable in
    `parse.py:FUNCTIONS`. Confirm that differentiation, substitution, and
-   simplification behave correctly for its domain. Add a parser regression
-   using a known identity and a case that should fail.
+   simplification behave correctly for its domain.
 3. **Add a command or form operation:** extend the command classes and
    `Verifier.pull` in `symplectic_verifier.py`, then the tokenizer/parser if it
-   needs textual syntax. Define its mathematical pullback first. Add regression
-   checks to the core suite and call them from `main()`; add parser demos with
-   explicit expected outcomes. Preserve simultaneous assignment semantics and
-   the reverse traversal used for sequential pullback.
+   needs textual syntax. Define its mathematical pullback first. Add parser demos with
+   explicit expected outcomes. 
 
 Use exact Sage arithmetic in Python drivers. Unlike `.spec` literals, a plain
 Python expression such as `1/3` becomes a float.  Use `QQ(1)/3`
