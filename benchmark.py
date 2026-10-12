@@ -7,11 +7,7 @@ Heavy-duty evaluation harness for the symplectic verifier.
 
 It runs the verifier over a curated benchmark suite, organised into three
 families, TIMES each run on the wall clock, and -- crucially -- KILLS any run
-that exceeds a hard per-benchmark budget (default 120 s).  The kill is done at
-the process-GROUP level (setsid + killpg): the verifier offloads heavy algebra
-to a Maxima/ECL child process, and an in-process `signal.alarm` cannot interrupt
-a blocking C call inside that child (see the project memory).  Only tearing down
-the whole process group reliably reclaims a wedged CAS computation.
+that exceeds a hard per-benchmark budget (default 120 s).  
 
 Benchmark families
 ------------------
