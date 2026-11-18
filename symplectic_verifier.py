@@ -69,7 +69,7 @@ def _simplify(coeff):
     (bare inverse-trig angles cancel as symbols; sines/cosines of them reduce
     via the trig identities), while keeping the expressions small."""
     try:
-        return coeff.simplify_trig().simplify_rational().canonicalize_radical()
+        return coeff.simplify_trig().simplify_rational()
     except Exception:
         return coeff.simplify_full()
 
